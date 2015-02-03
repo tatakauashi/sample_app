@@ -12,6 +12,12 @@ RSpec::Matchers.define :have_error_message do |message|
   end
 end
 
+RSpec::Matchers.define :have_submit_button do |value|
+  match do |page|
+    expect(page).to have_selector("input[type=submit][value='#{value}'].btn.btn-large.btn-primary")
+  end
+end
+
 def sign_in(user, options={})
   if options[:no_capybara]
     # Capybaraを使用していない場合にもサインインする。

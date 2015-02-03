@@ -46,6 +46,15 @@ describe "User pages" do
         end
         it { should_not have_link('delete', href: user_path(admin)) }
       end
+
+      describe "delete itself as admin" do
+        let(:admin) { FactoryGirl.create(:admin) }
+        before do
+          sign_in admin, no_capybara: true
+          delete user_path(admin)
+        end
+        specify { expect(response).to redirect_to(root_path) }
+      end
     end
   end
 
@@ -62,6 +71,12 @@ describe "User pages" do
 
     it { should have_content('Sign up') }
     it { should have_title(full_title('Sign up')) }
+    it { should have_field('Name') }
+    it { should have_field('Email') }
+    it { should have_field('Password') }
+    it { should have_field('Confirmation') }
+    #it { should have_selector('input[type=submit][value="Create my account"].btn.btn-large.btn-primary') }
+    it { should have_submit_button('Create my account') }
   end
 
   describe "signup" do
@@ -107,7 +122,7 @@ describe "User pages" do
   end
 
   describe "edit" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryGirl.create(:user, name: 'Person 1', email: 'person_1@example.com') }
     before do
       sign_in user
       visit edit_user_path(user)
@@ -117,6 +132,12 @@ describe "User pages" do
       it { should have_content("Update your profile") }
       it { should have_title("Edit user") }
       it { should have_link('change', href: "http://gravatar.com/emails") }
+      it { should have_field('Name',  type: 'text', with: 'Person 1') }
+      it { should have_field('Email', type: 'text', with: 'person_1@example.com') }
+      it { should have_field('Password', type: 'password') }
+      it { should_not have_field('Confirmation') }
+      #it { should have_selector('input[type=submit][value="Save changes"].btn.btn-large.btn-primary') }
+      it { should have_submit_button('Save changes') }
     end
 
     describe "with invalid information" do

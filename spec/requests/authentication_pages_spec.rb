@@ -76,6 +76,18 @@ describe "Authentication" do
           it "shoud render the desired protected page" do
             expect(page).to have_title('Edit user')
           end
+
+          describe "when signing in again" do
+            before do
+              delete signout_path
+              visit signin_path
+              sign_in user
+            end
+
+            it "should render the default (profile) page" do
+              expect(page).to have_title(user.name)
+            end
+          end
         end
       end
 
@@ -123,6 +135,34 @@ describe "Authentication" do
 
       describe "submitting a DELETE request to the User#destory action" do
         before { delete user_path(user) }
+        specify { expect(response).to redirect_to(root_path) }
+      end
+    end
+
+    describe "for login user" do
+      let(:user) { FactoryGirl.create(:user) }
+      let(:this_title) { full_title('') }
+
+      describe "signup page" do
+        before do
+          sign_in user
+          visit signup_path
+        end
+
+        it { should have_content('Sample App') }
+        it { should have_link('Sign up now!') }
+      end
+
+      describe "create user" do
+        #let(:new_user) { FactoryGirl.build(:user, email: 'new@example.com') }
+        let(:params) { { name: 'new_name', email: 'new@example.com',
+                         password: 'password',
+                         password_confirmation: 'password' } }
+
+        before do
+          sign_in user, no_capybara: true
+          post users_path, { user: params }
+        end
         specify { expect(response).to redirect_to(root_path) }
       end
     end
