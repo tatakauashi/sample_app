@@ -108,6 +108,19 @@ describe "Authentication" do
           specify { expect(response).to redirect_to(signin_path) }
         end
       end
+
+      describe "in the Microposts controller" do
+
+        describe "submitting to the create action" do
+          before { post microposts_path }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+
+        describe "submitting to the destroy action" do
+          before { delete micropost_path(FactoryGirl.create(:micropost)) }
+          specify { expect(response).to redirect_to(signin_path) }
+        end
+      end
     end
 
     describe "as wrong user" do
@@ -149,8 +162,10 @@ describe "Authentication" do
           visit signup_path
         end
 
-        it { should have_content('Sample App') }
-        it { should have_link('Sign up now!') }
+#        it { should have_content('Sample App') }
+        it { should have_content(user.name) }
+#        it { should have_link('Sign up now!') }
+        it { should have_submit_button('Post') }
       end
 
       describe "create user" do
